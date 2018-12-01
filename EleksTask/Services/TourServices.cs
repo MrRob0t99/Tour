@@ -78,7 +78,7 @@ namespace TourServer.Services
                     FileModel fileModel = new FileModel()
                     {
                         Name = files[i].FileName,
-                        Path = "https://tourserver20181130102657.azurewebsites.net/files/" + guid+ files[i].FileName,
+                        Path = "https://tourserver20181201023405.azurewebsites.net/files/" + guid+ files[i].FileName,
                         Tour = tour
                     };
                     list.Add(fileModel);
