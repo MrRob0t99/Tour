@@ -26,7 +26,7 @@ namespace TourServer.Services
             var response = new Response<int>();
             if (_context.Buskets.Any(b => b.ApplicationUserId == userId && b.TourId == dto.TourId))
             {
-                response.Error = new Error("Tour already added to busket");
+                response.Error = new Error("Tour already added to busket!!!");
                 return response;
             }
 
