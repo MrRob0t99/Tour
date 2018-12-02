@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TourServer.Migrations
 {
-    public partial class Init : Migration
+    public partial class AddedFields2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -234,6 +234,7 @@ namespace TourServer.Migrations
                     Name = table.Column<string>(nullable: true),
                     Price = table.Column<double>(nullable: false),
                     HotelId = table.Column<int>(nullable: false),
+                    isDeleted = table.Column<bool>(nullable: false),
                     CountrId = table.Column<int>(nullable: false),
                     CitId = table.Column<int>(nullable: false),
                     CityId = table.Column<int>(nullable: true),
@@ -324,7 +325,8 @@ namespace TourServer.Migrations
                     Duration = table.Column<int>(nullable: false),
                     TotalPrice = table.Column<decimal>(nullable: false),
                     Phone = table.Column<string>(nullable: true),
-                    IsConfirmed = table.Column<bool>(nullable: false)
+                    IsConfirmed = table.Column<bool>(nullable: false),
+                    Path = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

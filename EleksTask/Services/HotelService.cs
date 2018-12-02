@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using EleksTask;
-using Microsoft.EntityFrameworkCore;
 using TourServer.Dto;
 using TourServer.Models;
 using TourServer.ServicesInterface;

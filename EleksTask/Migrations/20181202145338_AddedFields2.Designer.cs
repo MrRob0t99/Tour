@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace TourServer.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20181119160424_Init")]
-    partial class Init
+    [Migration("20181202145338_AddedFields2")]
+    partial class AddedFields2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -308,6 +308,8 @@ namespace TourServer.Migrations
 
                     b.Property<bool>("IsConfirmed");
 
+                    b.Property<string>("Path");
+
                     b.Property<string>("Phone");
 
                     b.Property<DateTime>("StartDate");
@@ -346,6 +348,8 @@ namespace TourServer.Migrations
                     b.Property<string>("Name");
 
                     b.Property<double>("Price");
+
+                    b.Property<bool>("isDeleted");
 
                     b.HasKey("Id");
 

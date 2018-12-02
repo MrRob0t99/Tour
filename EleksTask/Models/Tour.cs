@@ -17,7 +17,7 @@ namespace TourServer.Models
 
         public bool isDeleted { get; set; }
 
-        public int CountryId { get; set; }
+        public int CountrId { get; set; }
 
         public int CitId { get; set; }
     }

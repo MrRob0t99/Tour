@@ -31,7 +31,7 @@ namespace TourServer.Services
             var hotel = await _unitOfWork.HotelRepository.Find(h => h.Id == createTourDto.HotelId,hot =>hot.City);
             tour.Hotel = hotel;
             tour.CitId = hotel.CityId;
-            tour.CountryId = hotel.City.CountryId;
+            tour.CountrId = hotel.City.CountryId;
             tour.Name = createTourDto.Name;
             tour.Price = createTourDto.Price;
             await _unitOfWork.TourRepository.Create(tour);
@@ -102,12 +102,12 @@ namespace TourServer.Services
             Predicate<Tour> filter = tour => true;
             if (requestDto.CountryId != 0 && requestDto.CityId == 0)
             {
-                filter = tour => tour.CountryId == requestDto.CountryId;
+                filter = tour => tour.CountrId == requestDto.CountryId;
             }
 
             if (requestDto.CountryId != 0 && requestDto.CityId != 0)
             {
-                filter = tour => tour.CountryId == requestDto.CountryId && tour.CitId == requestDto.CityId;
+                filter = tour => tour.CountrId == requestDto.CountryId && tour.CitId == requestDto.CityId;
             }
 
             Predicate<Tour> predicate = t => filter(t) && !t.isDeleted && t.Price > requestDto.Min && t.Price < requestDto.Max && t.Name.Contains(requestDto.Search);

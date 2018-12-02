@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using EleksTask;
-using Microsoft.EntityFrameworkCore;
 using TourServer.Dto;
 using TourServer.Models;
 using TourServer.ServicesInterface;
@@ -32,9 +29,9 @@ namespace TourServer.Services
 
             var country = new Country();
             country.Name = name;
-            var id = await _unitOfWork.CountryRepository.Create(country);
+            await _unitOfWork.CountryRepository.Create(country);
             await _unitOfWork.Commit();
-            response.Data = id;
+            response.Data = country.Id;
             return response;
         }
 

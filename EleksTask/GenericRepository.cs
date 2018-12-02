@@ -22,10 +22,9 @@ namespace TourServer
             _dbSet = context.Set<TEntity>();
         }
 
-        public async Task<int> Create(TEntity item)
+        public async Task Create(TEntity item)
         {
            await _dbSet.AddAsync(item);
-            return item.Id;
         }
         public async Task CreateRange(List<TEntity> items)
         {

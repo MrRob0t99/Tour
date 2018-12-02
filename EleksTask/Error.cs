@@ -14,11 +14,6 @@
             ErrorDescription = description;
             ErrorCode = 500;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="errorCode"></param>
-        /// <param name="description"></param>
         public Error(int errorCode, string description)
         {
             ErrorDescription = description;
