@@ -21,6 +21,10 @@ namespace TourServer.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateHotel([FromBody]HotelDto hotelDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
             var response = await _hotelService.CreateHotel(hotelDto);
             if (response.Error != null)
             {

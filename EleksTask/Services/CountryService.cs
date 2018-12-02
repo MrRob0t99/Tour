@@ -12,11 +12,11 @@ namespace TourServer.Services
 {
     public class CountryService : ICountryService
     {
-        private readonly ApplicationContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public CountryService(ApplicationContext context, IMapper mapper)
+        public CountryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
 
         }
@@ -24,7 +24,7 @@ namespace TourServer.Services
         public async Task<Response<int>> CreateCountry(string name)
         {
             var response = new Response<int>();
-            if (_context.Countries.Any(c => c.Name == name))
+            if (await _unitOfWork.CountryRepository.Any(c => c.Name == name))
             {
                 response.Error = new Error($"Country with name {name} already exist");
                 return response;
@@ -32,16 +32,16 @@ namespace TourServer.Services
 
             var country = new Country();
             country.Name = name;
-            await _context.Countries.AddAsync(country);
-            await _context.SaveChangesAsync();
-            response.Data = country.Id;
+            var id = await _unitOfWork.CountryRepository.Create(country);
+            await _unitOfWork.Commit();
+            response.Data = id;
             return response;
         }
 
         public async Task<Response<List<CountryResponseDto>>> GetCountry()
         {
             var response = new Response<List<CountryResponseDto>>();
-            var countries = await _context.Countries.ToListAsync();
+            var countries = await _unitOfWork.CountryRepository.Get();
             var dto = _mapper.Map<List<CountryResponseDto>>(countries);
             response.Data = dto;
             return response;

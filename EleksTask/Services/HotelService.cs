@@ -12,18 +12,19 @@ namespace TourServer.Services
 {
     public class HotelService : IHotelService
     {
-        private readonly ApplicationContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public HotelService(ApplicationContext context, IMapper mapper)
+
+        public HotelService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
         public async Task<Response<int>> CreateHotel(HotelDto hotelDto)
         {
             var response = new Response<int>();
-            var city = await _context.Cities.FirstOrDefaultAsync(c => c.Id == hotelDto.CityId);
+            var city = await _unitOfWork.CityRepository.Find(c => c.Id == hotelDto.CityId);
             var hotel = new Hotel()
             {
                 Name = hotelDto.Name,
@@ -34,8 +35,8 @@ namespace TourServer.Services
                 CityId = city.Id
             };
 
-            await _context.Hotels.AddAsync(hotel);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.HotelRepository.Create(hotel);
+            await _unitOfWork.Commit();
 
             response.Data = hotel.Id;
             return response;
@@ -44,7 +45,7 @@ namespace TourServer.Services
         public async Task<Response<List<HotelResponseDto>>> GetHotels(int id)
         {
             var response = new Response<List<HotelResponseDto>>();
-            var hotels = await _context.Hotels.Where(h => h.City.Id == id).ToListAsync();
+            var hotels = await _unitOfWork.HotelRepository.Get(h => h.City.Id == id);
             var dto = _mapper.Map<List<HotelResponseDto>>(hotels);
             response.Data = dto;
             return response;

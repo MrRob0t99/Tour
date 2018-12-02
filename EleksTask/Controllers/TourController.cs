@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using EleksTask;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TourServer.Dto;
-using TourServer.Models;
 using TourServer.ServicesInterface;
 
 namespace TourServer.Controllers
@@ -43,6 +35,7 @@ namespace TourServer.Controllers
         [HttpPost("file/{tourId}")]
         public async Task<IActionResult> UploadFile([FromRoute]int tourId, IFormFileCollection files)
         {
+
             var response = await _tourService.UploadFile(tourId,files);
             if (response.Error != null)
             {
@@ -55,6 +48,11 @@ namespace TourServer.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllTour([FromQuery]GetToursRequestDto requestDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var response = await _tourService.GetAllTour(requestDto);
             if (response.Error != null)
             {

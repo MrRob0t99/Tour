@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TourServer.Models
 {
-    public class EmailToken
+    public class EmailToken: BaseEntity
     {
-        [Key]
-        public int Id { get; set; }
 
         public Guid Token { get; set; }
 

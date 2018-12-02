@@ -1,8 +1,7 @@
 ﻿namespace TourServer.Models
 {
-    public class Hotel
+    public class Hotel : BaseEntity
     {
-        public int Id { get; set; }
 
         public string Name { get; set; }
 

@@ -4,9 +4,8 @@ using EleksTask.Models;
 
 namespace TourServer.Models
 {
-    public class Order
+    public class Order : BaseEntity
     {
-        public int Id { get; set; }
 
         public Tour Tour { get; set; }
 

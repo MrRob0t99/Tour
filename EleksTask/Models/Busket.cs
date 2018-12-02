@@ -2,9 +2,8 @@
 
 namespace TourServer.Models
 {
-    public class Busket
+    public class Busket : BaseEntity
     {
-        public int Id { get; set; }
 
         public ApplicationUser ApplicationUser { get; set; }
 

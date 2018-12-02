@@ -103,6 +103,8 @@ namespace EleksTask
             services.AddTransient<IHotelService, HotelService>();
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<ITourService, TourServices>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

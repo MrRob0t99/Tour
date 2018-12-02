@@ -15,12 +15,12 @@ namespace TourServer.Services
 {
     public class TourServices : ITourService
     {
-        private readonly ApplicationContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IHostingEnvironment _environment;
 
-        public TourServices(ApplicationContext context, IHostingEnvironment environment)
+        public TourServices(IUnitOfWork unitOfWork, IHostingEnvironment environment)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _environment = environment;
         }
 
@@ -28,14 +28,14 @@ namespace TourServer.Services
         {
             var response = new Response<int>();
             var tour = new Tour();
-            var hotel = await _context.Hotels.Include(h => h.City).FirstOrDefaultAsync(c => c.Id == createTourDto.HotelId);
+            var hotel = await _unitOfWork.HotelRepository.Find(h => h.Id == createTourDto.HotelId,hot =>hot.City);
             tour.Hotel = hotel;
             tour.CitId = hotel.CityId;
-            tour.CountrId = hotel.City.CountryId;
+            tour.CountryId = hotel.City.CountryId;
             tour.Name = createTourDto.Name;
             tour.Price = createTourDto.Price;
-            await _context.Tours.AddAsync(tour);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.TourRepository.Create(tour);
+            await _unitOfWork.Commit();
             response.Data = tour.Id;
             return response;
         }
@@ -43,7 +43,7 @@ namespace TourServer.Services
         public async Task<Response<bool>> UploadFile(int tourId, IFormFileCollection files)
         {
             var response = new Response<bool>();
-            var tour = await _context.Tours.FirstOrDefaultAsync(t => t.Id == tourId);
+            var tour = await _unitOfWork.TourRepository.Find(t => t.Id == tourId);
             var list = new List<FileModel>();
             if (files == null || files.Count == 0)
             {
@@ -54,7 +54,7 @@ namespace TourServer.Services
                     Path = "http://asa.az/uploads/default.png",
                     Tour = tour
                 };
-                await _context.FileModels.AddAsync(fileModel);
+                await _unitOfWork.FileRepository.Create(fileModel);
             }
 
             var folder = Path.Combine(_environment.WebRootPath, "files");
@@ -69,7 +69,7 @@ namespace TourServer.Services
                 if (files[i] != null)
                 {
                     var guid = Guid.NewGuid();
-                    string path = Path.Combine(folder, guid+files[i].FileName);
+                    string path = Path.Combine(folder, guid + files[i].FileName);
                     using (var fileStream = new FileStream(path, FileMode.Create))
                     {
                         await files[i].CopyToAsync(fileStream);
@@ -78,22 +78,21 @@ namespace TourServer.Services
                     FileModel fileModel = new FileModel()
                     {
                         Name = files[i].FileName,
-                        Path = "https://tourserver20181201023405.azurewebsites.net/files/" + guid+ files[i].FileName,
+                        Path = "https://tourserver20181201023405.azurewebsites.net/files/" + guid + files[i].FileName,
                         Tour = tour
                     };
                     list.Add(fileModel);
                 }
-                await _context.FileModels.AddRangeAsync(list);
+                await _unitOfWork.FileRepository.CreateRange(list);
             }
 
-            await _context.SaveChangesAsync();
+            await _unitOfWork.Commit();
             response.Data = true;
             return response;
         }
 
         public async Task<Response<GetToursResponseDto>> GetAllTour(GetToursRequestDto requestDto)
         {
-
             var response = new Response<GetToursResponseDto>(); ;
             if (requestDto.Search == null)
             {
@@ -103,30 +102,39 @@ namespace TourServer.Services
             Predicate<Tour> filter = tour => true;
             if (requestDto.CountryId != 0 && requestDto.CityId == 0)
             {
-                filter = tour => tour.CountrId == requestDto.CountryId;
+                filter = tour => tour.CountryId == requestDto.CountryId;
             }
 
             if (requestDto.CountryId != 0 && requestDto.CityId != 0)
             {
-                filter = tour => tour.CountrId == requestDto.CountryId && tour.CitId == requestDto.CityId;
+                filter = tour => tour.CountryId == requestDto.CountryId && tour.CitId == requestDto.CityId;
             }
-            var count = await _context.Tours
-                .Where(t => t.Price > requestDto.Min && t.Price < requestDto.Max && t.Name.Contains(requestDto.Search) && filter(t))
-                .CountAsync();
+
+            Predicate<Tour> predicate = t => filter(t) && !t.isDeleted && t.Price > requestDto.Min && t.Price < requestDto.Max && t.Name.Contains(requestDto.Search);
+            var count = await _unitOfWork
+                .TourRepository
+                .Count(tour => predicate(tour));
 
             int skip = (requestDto.Page - 1) * requestDto.Size;
 
-            var listTour = await _context.Tours
-                .Skip(skip)
-                .Take(requestDto.Size)
-                .Include(t => t.FileModels)
-                .Where(t => t.Price > requestDto.Min && t.Price < requestDto.Max && t.Name.Contains(requestDto.Search) && filter(t))
-                .Select(t => new ToursRespoonse { Id = t.Id, Name = t.Name, Price = t.Price, Path = t.FileModels.FirstOrDefault().Path })
-                .ToListAsync();
+            var listTour = await _unitOfWork.TourRepository.Get(tour =>predicate(tour),skip, requestDto.Size,tour =>tour.FileModels );
+            var responseList = new List<ToursRespoonse>();
+            for (int i=0;i<listTour.Count;i++)
+            {
+                var elem = new ToursRespoonse
+                {
+                    Id = listTour[i].Id,
+                    Name = listTour[i].Name,
+                    Price = listTour[i].Price,
+                    Path = listTour[i].FileModels.FirstOrDefault()?.Path
+                };
+                responseList[i] = elem;
+            };
+
             response.Data = new GetToursResponseDto()
             {
                 Count = count,
-                ListTour = listTour
+                ListTour = responseList
             };
             return response;
         }
@@ -134,13 +142,8 @@ namespace TourServer.Services
         public async Task<Response<GetTourResponseDto>> GetTourById(int id)
         {
             var response = new Response<GetTourResponseDto>();
-            var tour = await _context.Tours
-                .Where(t => t.Id == id)
-                .Include(t => t.FileModels)
-                .Include(t => t.Hotel)
-                .ThenInclude(h => h.City)
-                .ThenInclude(c => c.Country)
-                .FirstOrDefaultAsync();
+            var tour = await _unitOfWork.TourRepository.Find(t => t.Id == id, tour1 => tour1.Hotel, tour2 => tour2.Hotel.City,
+                tour3 => tour3.Hotel.City.Country);
 
             if (tour == null)
             {
@@ -168,7 +171,7 @@ namespace TourServer.Services
         public async Task<Response<bool>> DeleteTour(int id)
         {
             var response = new Response<bool>();
-            var tour = await _context.Tours.FirstOrDefaultAsync(t => t.Id == id);
+            var tour = await _unitOfWork.TourRepository.Find(t => t.Id == id);
 
             if (tour == null)
             {
@@ -176,8 +179,9 @@ namespace TourServer.Services
                 return response;
             }
 
-            _context.Tours.Remove(tour);
-            await _context.SaveChangesAsync();
+            tour.isDeleted = true;
+            _unitOfWork.TourRepository.Update(tour);
+            _unitOfWork.TourRepository.Update(tour);
             response.Data = true;
             return response;
         }

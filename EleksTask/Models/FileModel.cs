@@ -1,8 +1,7 @@
 ﻿namespace TourServer.Models
 {
-    public class FileModel
+    public class FileModel : BaseEntity
     {
-        public int Id { get; set; }
 
         public string Name { get; set; }
 

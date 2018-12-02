@@ -1,15 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using EleksTask;
+﻿using System.Threading.Tasks;
 using EleksTask.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TourServer.Dto;
-using TourServer.Models;
 using TourServer.ServicesInterface;
 
 namespace TourServer.Controllers
@@ -61,19 +55,6 @@ namespace TourServer.Controllers
         public async Task<IActionResult> DeleteOrder([FromRoute]int id)
         {
             var response = await _orderService.DeleteOrder(id);
-            if (response.Error != null)
-            {
-                return BadRequest(response);
-            }
-
-            return Ok(response);
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> ConfirmOrder([FromRoute] int id)
-        {
-            var response = await _orderService.ConfirmOrder(id);
             if (response.Error != null)
             {
                 return BadRequest(response);

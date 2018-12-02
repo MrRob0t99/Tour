@@ -2,9 +2,8 @@
 
 namespace TourServer.Models
 {
-    public class Tour
+    public class Tour: BaseEntity
     {
-        public int Id { get; set; }
 
         public string Name { get; set; }
 
@@ -16,7 +15,9 @@ namespace TourServer.Models
 
         public int HotelId { get; set; }
 
-        public int CountrId { get; set; }
+        public bool isDeleted { get; set; }
+
+        public int CountryId { get; set; }
 
         public int CitId { get; set; }
     }

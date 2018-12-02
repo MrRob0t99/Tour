@@ -12,8 +12,6 @@ namespace TourServer.ServicesInterface
 
         Task<Response<bool>> DeleteOrder(int id);
 
-        Task<Response<bool>> ConfirmOrder(int id);
-
         Task<Response<List<GetOrdersResponseDto>>> GetAllOrders();
     }
 }

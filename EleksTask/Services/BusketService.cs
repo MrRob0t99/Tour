@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using EleksTask;
-using EleksTask.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TourServer.Dto;
 using TourServer.Models;
@@ -26,7 +23,7 @@ namespace TourServer.Services
             var response = new Response<int>();
             if (_context.Buskets.Any(b => b.ApplicationUserId == userId && b.TourId == dto.TourId))
             {
-                response.Error = new Error("Tour already added to busket!!!");
+                response.Error = new Error("Tour already added to busket");
                 return response;
             }
 
