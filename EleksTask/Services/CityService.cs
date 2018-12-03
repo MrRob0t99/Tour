@@ -36,9 +36,9 @@ namespace TourServer.Services
                 Country = country
             };
 
-            var id = await _unitOfWork.CityRepository.Create(city);
+            await _unitOfWork.CityRepository.Create(city);
             await _unitOfWork.Commit();
-            response.Data = id;
+            response.Data = city.Id;
             return response;
         }
 

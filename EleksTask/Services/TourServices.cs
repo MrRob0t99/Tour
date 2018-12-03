@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using EleksTask;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using TourServer.Dto;
 using TourServer.Models;
 using TourServer.ServicesInterface;
@@ -28,7 +26,7 @@ namespace TourServer.Services
         {
             var response = new Response<int>();
             var tour = new Tour();
-            var hotel = await _unitOfWork.HotelRepository.Find(h => h.Id == createTourDto.HotelId,hot =>hot.City);
+            var hotel = await _unitOfWork.HotelRepository.Find(h => h.Id == createTourDto.HotelId, hot => hot.City);
             tour.Hotel = hotel;
             tour.CitId = hotel.CityId;
             tour.CountrId = hotel.City.CountryId;
@@ -117,19 +115,19 @@ namespace TourServer.Services
 
             int skip = (requestDto.Page - 1) * requestDto.Size;
 
-            var listTour = await _unitOfWork.TourRepository.Get(tour =>predicate(tour),skip, requestDto.Size,tour =>tour.FileModels );
+            var listTour = await _unitOfWork.TourRepository.Get(tour => predicate(tour), skip, requestDto.Size, tour => tour.FileModels);
             var responseList = new List<ToursRespoonse>();
-            for (int i=0;i<listTour.Count;i++)
+            foreach (var elem in listTour)
             {
-                var elem = new ToursRespoonse
+                var item = new ToursRespoonse
                 {
-                    Id = listTour[i].Id,
-                    Name = listTour[i].Name,
-                    Price = listTour[i].Price,
-                    Path = listTour[i].FileModels.FirstOrDefault()?.Path
+                    Id = elem.Id,
+                    Name = elem.Name,
+                    Price = elem.Price,
+                    Path = elem.FileModels.FirstOrDefault()?.Path
                 };
-                responseList[i] = elem;
-            };
+                responseList.Add(item);
+            }
 
             response.Data = new GetToursResponseDto()
             {
@@ -143,7 +141,7 @@ namespace TourServer.Services
         {
             var response = new Response<GetTourResponseDto>();
             var tour = await _unitOfWork.TourRepository.Find(t => t.Id == id, tour1 => tour1.Hotel, tour2 => tour2.Hotel.City,
-                tour3 => tour3.Hotel.City.Country);
+                tour3 => tour3.Hotel.City.Country, tour4 => tour4.FileModels);
 
             if (tour == null)
             {
@@ -181,7 +179,7 @@ namespace TourServer.Services
 
             tour.isDeleted = true;
             _unitOfWork.TourRepository.Update(tour);
-            _unitOfWork.TourRepository.Update(tour);
+            await _unitOfWork.Commit();
             response.Data = true;
             return response;
         }

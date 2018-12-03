@@ -29,9 +29,9 @@ namespace TourServer.Services
             order.ApplicationUserId = userId;
             order.IsConfirmed = false;
             order.Path = tour.FileModels.FirstOrDefault()?.Path;
-            var id = await _unitOfWork.OrderRepository.Create(order);
+            await _unitOfWork.OrderRepository.Create(order);
             await _unitOfWork.Commit();
-            response.Data = id;
+            response.Data = order.Id;
             return response;
         }
 

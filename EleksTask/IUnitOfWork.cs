@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using EleksTask.Models;
 using TourServer.Models;
 
 namespace TourServer

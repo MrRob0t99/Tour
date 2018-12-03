@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using TourServer.Models;
 
 namespace EleksTask.Models
 {
