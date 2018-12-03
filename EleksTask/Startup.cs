@@ -109,6 +109,11 @@ namespace EleksTask
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<ApplicationContext>().Database.Migrate();
+            }
+
             app.UseCors("MyPolicy");
 
             if (env.IsDevelopment())

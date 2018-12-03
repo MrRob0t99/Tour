@@ -14,7 +14,6 @@ namespace TourServer
         private GenericRepository<Hotel> _hotelRepository;
         private GenericRepository<FileModel> _fileRepository;
 
-        IGenericRepository<Hotel> ApplicationUser { get; }
         public IGenericRepository<Tour> TourRepository
         {
             get

@@ -48,7 +48,7 @@ namespace TourServer
 
             if (filter != null)
                 query = query.Where(filter);
-            return await query.FirstOrDefaultAsync(filter);
+            return await query.FirstOrDefaultAsync();
         }
 
         public async Task<bool> Any(Expression<Func<TEntity, bool>> predicate)
