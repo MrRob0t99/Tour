@@ -36,7 +36,6 @@ namespace TourServer.Services
             _configuration = configuration;
         }
 
-        [HttpPost("token")]
         public async Task<Response<LogInResponseDto>> LogInAsync(LogInDto logInDto)
         {
             var response = new Response<LogInResponseDto>();
@@ -73,7 +72,6 @@ namespace TourServer.Services
             return response;
         }
 
-        [HttpPost("registration")]
         public async Task<Response<string>> Registration(RegistrationDto registrationDto)
         {
 
@@ -132,7 +130,6 @@ namespace TourServer.Services
             return response;
         }
 
-        [HttpPut("confirmEmail")]
         public async Task<Response<bool>> ConfirmEmail(Guid token, [FromQuery] string userId)
         {
             var response = new Response<bool>();

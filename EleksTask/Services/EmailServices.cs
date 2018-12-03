@@ -9,7 +9,7 @@ namespace TourServer
     {
         public async Task SendConfirmLetter(string token, string userId, string userEmail)
         {
-            var apiPath = "http://localhost:4200/confirmEmail?token=" + token + "&user=" + userId;
+            var apiPath = "https://mrrob0t99.github.io/tour-client/confirmEmail?token=" + token + "&user=" + userId;
             var link = "<a href='" + apiPath + "'>link</a>";
 
             await SendEmailAsync(userEmail, "Confirm Email", link);
